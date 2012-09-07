@@ -172,6 +172,22 @@ module RubyXL
         sheet_views_node= files[j].xpath('/xmlns:worksheet/xmlns:sheetViews[xmlns:sheetView]',namespaces).first
         wb.worksheets[i].sheet_view = Hash.xml_node_to_hash(sheet_views_node)[:sheetView]
 
+        ##sheetFormatPr##
+        sheet_format_pr_node = files[j].xpath('/xmlns:worksheet/xmlns:sheetFormatPr', namespaces).first
+        wb.worksheets[i].sheet_format_pr = Hash.xml_node_to_hash(sheet_format_pr_node)
+
+        ##sheetPr##
+        sheet_pr_node = files[j].xpath('/xmlns:worksheet/xmlns:sheetPr', namespaces).first
+        wb.worksheets[i].sheet_pr = Hash.xml_node_to_hash(sheet_pr_node)
+
+        ##pageMargins##
+        page_margins_node = files[j].xpath('/xmlns:worksheet/xmlns:pageMargins', namespaces).first
+        wb.worksheets[i].page_margins = Hash.xml_node_to_hash(page_margins_node)
+
+        ##pageSetup##
+        page_setup_node = files[j].xpath('/xmlns:worksheet/xmlns:pageSetup', namespaces).first
+        wb.worksheets[i].page_setup = Hash.xml_node_to_hash(page_setup_node)
+
         ##col styles##
         cols_node_set = files[j].xpath('/xmlns:worksheet/xmlns:cols',namespaces)
         unless cols_node_set.empty?
@@ -220,7 +236,8 @@ module RubyXL
       end
 
 
-      row_data = files[j].xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row[xmlns:c[xmlns:v]]',namespaces)
+      #row_data = files[j].xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row[xmlns:c[xmlns:v]]',namespaces)
+      row_data = files[j].xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row',namespaces)
       row_data.each do |row|
         unless @data_only
           ##row styles##
