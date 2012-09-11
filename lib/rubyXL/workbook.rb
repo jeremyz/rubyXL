@@ -317,7 +317,7 @@ module RubyXL
     #necessary because can take the form of hash or array,
     #based on odd behavior of Nokogiri
     def get_style_attributes(xf_obj)
-      if xf_obj.is_a?Array
+      if !xf_obj.nil? && xf_obj.is_a?Array
         xf = xf_obj[1]
       else
         xf = xf_obj[:attributes]
