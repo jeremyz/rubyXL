@@ -343,7 +343,7 @@ module RubyXL
           files['externalLinks'] = {}
           ext_links_path = File.join(dir_path,'xl','externalLinks')
           FileUtils.mkdir_p(ext_links_path)
-          files['externalLinks']['rels'] = []
+          files['externalLinks']['rels'] = {}
           dir = Dir.new(ext_links_path).entries.reject {|f| [".", "..", ".DS_Store", "_rels"].include? f}
 
           dir.each_with_index do |link,i|
