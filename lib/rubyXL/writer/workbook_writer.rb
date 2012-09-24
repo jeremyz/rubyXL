@@ -33,18 +33,17 @@ module Writer
             xml.workbookView('xWindow'=>'-20', 'yWindow'=>'-20',
               'windowWidth'=>'21600','windowHeight'=>'13340','tabRatio'=>'500')
           }
-          index = 0
           xml.sheets {
             @workbook.worksheets.each_with_index do |sheet,i|
-              xml.sheet('name'=>sheet.sheet_name, 'sheetId'=>(i+1).to_s(),
-              'r:id'=>'rId'+(i+1).to_s())
-              index = i+1
+              j = (i+1).to_s
+              xml.sheet('name'=>sheet.sheet_name, 'sheetId'=>j, 'r:id'=>'rId'+j)
             end
           }
           unless @workbook.external_links.nil?
             xml.externalReferences {
-              index.upto(@workbook.external_links.size-1) do |id|
-                xml.externalReference('r:id'=>"rId#{id+index}")
+              n = @workbook.worksheets.size
+              (n+1).upto(@workbook.external_links.size+n) do |id|
+                xml.externalReference('r:id'=>"rId#{id}")
               end
             }
           end
