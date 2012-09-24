@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'tmpdir'
 require 'nokogiri'
 require 'zip/zip' #rubyzip
 require File.expand_path(File.join(File.dirname(__FILE__),'Hash'))
@@ -307,17 +308,11 @@ module RubyXL
 
     def Parser.decompress(file_path, skip_filename_check = false)
       #ensures it is an xlsx/xlsm file
-      if(file_path =~ /(.+)\.xls(x|m)/)
-        dir_path = $1.to_s
-      else
-        if skip_filename_check
-          dir_path = file_path
-        else
-          raise 'Not .xlsx or .xlsm excel file'
-        end
+      if not skip_filename_check and not (file_path =~ /(.+)\.xls(x|m)/)
+        raise 'Not .xlsx or .xlsm excel file'
       end
 
-      dir_path = File.join(File.dirname(dir_path), make_safe_name(Time.now.to_s))
+      dir_path = Dir.mktmpdir
       #copies excel file to zip file in same directory
       zip_path = dir_path + '.zip'
 
@@ -450,18 +445,6 @@ module RubyXL
         raise 'invalid file'
       end
       sheet
-    end
-
-    def Parser.safe_filename(name, allow_mb_chars=false)
-      # "\w" represents [0-9A-Za-z_] plus any multi-byte char
-      regexp = allow_mb_chars ? /[^\w]/ : /[^0-9a-zA-Z\_]/
-      name.gsub(regexp, "_")
-    end
-
-    # Turns the passed in string into something safe for a filename
-    def Parser.make_safe_name(name, allow_mb_chars=false)
-      ext = safe_filename(File.extname(name), allow_mb_chars).gsub(/^_/, '.')
-      "#{safe_filename(name.gsub(ext, ""), allow_mb_chars)}#{ext}".gsub(/\(/, '_').gsub(/\)/, '_').gsub(/__+/, '_').gsub(/^_/, '').gsub(/_$/, '')
     end
 
   end
