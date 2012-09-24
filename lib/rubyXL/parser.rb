@@ -68,16 +68,16 @@ module RubyXL
         end
       end
       #styles are needed for formatting reasons as that is how dates are determined
-        styles = files['styles'].css('cellXfs xf')
-        style_hash = Hash.xml_node_to_hash(files['styles'].root)
-        fill_styles(wb,style_hash)
+      styles = files['styles'].css('cellXfs xf')
+      style_hash = Hash.xml_node_to_hash(files['styles'].root)
+      fill_styles(wb,style_hash)
 
-        #will be nil if these files do not exist
-        wb.external_links = files['externalLinks']
-        wb.drawings = files['drawings']
-        wb.printer_settings = files['printerSettings']
-        wb.worksheet_rels = files['worksheetRels']
-        wb.macros = files['vbaProject']
+      #will be nil if these files do not exist
+      wb.external_links = files['externalLinks']
+      wb.drawings = files['drawings']
+      wb.printer_settings = files['printerSettings']
+      wb.worksheet_rels = files['worksheetRels']
+      wb.macros = files['vbaProject']
 
       #for each worksheet:
       #1. find the dimensions of the data matrix
