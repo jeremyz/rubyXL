@@ -338,59 +338,59 @@ module RubyXL
       end
 
       unless @data_only
-        #preserves external links
-        if File.directory?(File.join(dir_path,'xl','externalLinks'))
-          files['externalLinks'] = {}
-          ext_links_path = File.join(dir_path,'xl','externalLinks')
-          FileUtils.mkdir_p(ext_links_path)
-          files['externalLinks']['rels'] = {}
-          dir = Dir.new(ext_links_path).entries.reject {|f| [".", "..", ".DS_Store", "_rels"].include? f}
+        ignored_files = [".", "..", "_rels", ".DS_Store"]
 
+        #preserves external links
+        ext_links_path = File.join(dir_path,'xl','externalLinks')
+        if File.directory?(ext_links_path)
+          files['externalLinks'] = {}
+          dir = Dir.new(ext_links_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |link,i|
             files['externalLinks'][i+1] = File.read(File.join(ext_links_path,link))
           end
 
-          if File.directory?(File.join(ext_links_path,'_rels'))
-            dir = Dir.new(File.join(ext_links_path,'_rels')).entries.reject{|f| [".","..",".DS_Store"].include? f}
+          ext_links_rels_path = File.join(ext_links_path,'_rels')
+          files['externalLinks']['rels'] = {}
+          if File.directory?(ext_links_rels_path)
+            dir = Dir.new(ext_links_rels_path).entries.reject{|f| ignored_files.include? f}
             dir.each_with_index do |rel,i|
               files['externalLinks']['rels'][i+1] = File.read(File.join(ext_links_path,'_rels',rel))
             end
+          else
+            FileUtils.mkdir_p(ext_links_rels_path)
           end
         end
 
-        if File.directory?(File.join(dir_path,'xl','drawings'))
+        drawings_path = File.join(dir_path,'xl','drawings','_rels')
+        if File.directory?(drawings_path)
           files['drawings'] = {}
-          drawings_path = File.join(dir_path,'xl','drawings','_rels')
-          FileUtils.mkdir_p(drawings_path)
-          dir = Dir.new(drawings_path).entries.reject {|f| [".", "..", ".DS_Store"].include? f}
+          dir = Dir.new(drawings_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |draw,i|
             files['drawings'][i+1] = File.read(File.join(drawings_path,draw))
           end
         end
 
-        if File.directory?(File.join(dir_path,'xl','printerSettings'))
+        printer_path = File.join(dir_path,'xl','printerSettings')
+        if File.directory?(printer_path)
           files['printerSettings'] = {}
-          printer_path = File.join(dir_path,'xl','printerSettings')
-          FileUtils.mkdir_p(printer_path)
-          dir = Dir.new(printer_path).entries.reject {|f| [".","..",".DS_Store"].include? f}
-
+          dir = Dir.new(printer_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |print, i|
             files['printerSettings'][i+1] = File.open(File.join(printer_path,print), 'rb').read
           end
         end
 
-        if File.directory?(File.join(dir_path,"xl",'worksheets','_rels'))
+        worksheet_rels_path = File.join(dir_path,'xl','worksheets','_rels')
+        if File.directory?(worksheet_rels_path)
           files['worksheetRels'] = {}
-          worksheet_rels_path = File.join(dir_path,'xl','worksheets','_rels')
-          FileUtils.mkdir_p(worksheet_rels_path)
-          dir = Dir.new(worksheet_rels_path).entries.reject {|f| [".","..",".DS_Store"].include? f}
+          dir = Dir.new(worksheet_rels_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |rel, i|
             files['worksheetRels'][i+1] = File.read(File.join(worksheet_rels_path,rel))
           end
         end
 
-        if File.exist?(File.join(dir_path,'xl','vbaProject.bin'))
-          files['vbaProject'] = File.open(File.join(dir_path,"xl","vbaProject.bin"),'rb').read
+        vba_path = File.join(dir_path,'xl','vbaProject.bin')
+        if File.exist?(vba_path)
+          files['vbaProject'] = File.open(vba_path,'rb').read
         end
       end
       files['styles'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','styles.xml'),'r'))
