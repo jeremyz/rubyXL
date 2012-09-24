@@ -3,7 +3,8 @@ class Worksheet < PrivateClass
   include Enumerable
 
   attr_accessor :sheet_name, :sheet_data, :cols, :merged_cells, :pane,
-    :validations, :sheet_view, :legacy_drawing, :extLst, :workbook, :row_styles
+                :validations, :sheet_view, :legacy_drawing, :extLst, :workbook, :row_styles, :sheet_format_pr, :sheet_pr,
+                :page_margins, :page_setup
 
   def initialize(workbook, sheet_name='Sheet1',sheet_data=[[nil]],cols=[], merged_cells=[])
     @workbook = workbook

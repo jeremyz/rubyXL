@@ -1,3 +1,4 @@
+# encoding: utf-8
 # require File.expand_path(File.join(File.dirname(__FILE__),'workbook'))
 # require File.expand_path(File.join(File.dirname(__FILE__),'worksheet'))
 # require File.expand_path(File.join(File.dirname(__FILE__),'cell'))
@@ -64,11 +65,11 @@ module Writer
           }
         }
       end
-      contents = builder.to_xml
-      contents = contents.gsub(/\n/,'')
-      contents = contents.gsub(/>(\s)+</,'><')
-      contents = contents.gsub(/<!\[CDATA\[(.*)\]\]>/,'\1')
-      contents = contents.sub(/<\?xml version=\"1.0\"\?>/,'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+"\n")
+      contents = builder.to_xml :encoding => 'UTF-8'
+      contents = contents.gsub(/\n/u,'')
+      contents = contents.gsub(/>(\s)+</u,'><')
+      contents = contents.gsub(/<!\[CDATA\[(.*)\]\]>/u,'\1')
+      contents = contents.sub(/<\?xml version=\"1.0\"\?>/u,'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+"\n")
       contents
     end
   end

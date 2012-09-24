@@ -31,6 +31,15 @@ module Writer
           row = Integer(@worksheet.sheet_data.size)
           dimension = 'A1:'
           dimension += Cell.convert_to_cell(row-1,col-1)
+
+          if (page_set_up_pr = @worksheet.sheet_pr[:pageSetUpPr])
+            xml.sheetPr(@worksheet.sheet_pr[:attributes]) do
+              xml.pageSetUpPr(page_set_up_pr[:attributes])
+            end
+          else
+            xml.sheetPr(@worksheet.sheet_pr[:attributes])
+          end
+
           xml.dimension('ref'=>dimension)
           xml.sheetViews {
             view = @worksheet.sheet_view
@@ -73,7 +82,7 @@ module Writer
               }
             end
           }
-          xml.sheetFormatPr('baseColWidth'=>'10','defaultRowHeight'=>'13')
+          xml.sheetFormatPr(@worksheet.sheet_format_pr[:attributes])
 
           unless @worksheet.cols.nil? || @worksheet.cols.size==0
             xml.cols {
@@ -108,7 +117,7 @@ module Writer
                 @worksheet.row_styles[(i+1).to_s][:style] = '0'
               end
               custom_format = '1'
-              if @worksheet.row_styles[(i+1).to_s][:style] == '0'
+              if @worksheet.row_styles[(i+1).to_s][:style].to_s == '0'
                 custom_format = '0'
               end
 
@@ -118,15 +127,17 @@ module Writer
                 'spans'=>'1:'+row.size.to_s,
                 'customFormat'=>custom_format
               }
+
               unless @worksheet.row_styles[(i+1).to_s][:style].to_s == ''
                 row_opts['s'] = @worksheet.row_styles[(i+1).to_s][:style].to_s
               end
               unless @worksheet.row_styles[(i+1).to_s][:height].to_s == ''
                 row_opts['ht'] = @worksheet.row_styles[(i+1).to_s][:height].to_s
               end
-              unless @worksheet.row_styles[(i+1).to_s][:customheight].to_s == ''
-                row_opts['customHeight'] = @worksheet.row_styles[(i+1).to_s][:customHeight].to_s
-              end
+
+              row_opts['customHeight'] = @worksheet.row_styles[(i+1).to_s][:customHeight] if @worksheet.row_styles[(i+1).to_s][:customHeight]
+              row_opts['thickBot'] = @worksheet.row_styles[(i+1).to_s][:thickBot] if @worksheet.row_styles[(i+1).to_s][:thickBot]
+
               xml.row(row_opts) {
                 row.each_with_index do |dat, j|
                   unless dat.nil?
@@ -198,11 +209,9 @@ module Writer
             }
           end
 
-          xml.pageMargins('left'=>'0.75','right'=>'0.75','top'=>'1',
-            'bottom'=>'1','header'=>'0.5','footer'=>'0.5')
+          xml.pageMargins(@worksheet.page_margins[:attributes])
 
-          xml.pageSetup('orientation'=>'portrait',
-            'horizontalDpi'=>'4294967292', 'verticalDpi'=>'4294967292')
+          xml.pageSetup(@worksheet.page_setup[:attributes])
 
           unless @worksheet.legacy_drawing.nil?
             xml.legacyDrawing('r:id'=>@worksheet.legacy_drawing[:attributes][:id])
@@ -219,9 +228,9 @@ module Writer
         }
       end
       contents = builder.to_xml
-      contents = contents.gsub(/\n/,'')
-      contents = contents.gsub(/>(\s)+</,'><')
-      contents = contents.sub(/<\?xml version=\"1.0\"\?>/,'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+"\n")
+      contents = contents.gsub(/\n/u,'')
+      contents = contents.gsub(/>(\s)+</u,'><')
+      contents = contents.sub(/<\?xml version=\"1.0\"\?>/u,'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+"\n")
       contents
     end
 
