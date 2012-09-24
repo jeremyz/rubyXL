@@ -326,11 +326,12 @@ module RubyXL
 
       files['app'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'docProps','app.xml'),'r'))
       files['core'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'docProps','core.xml'),'r'))
-
       files['workbook'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','workbook.xml'),'r'))
+      files['styles'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','styles.xml'),'r'))
 
-      if(File.exist?(File.join(dir_path,'xl','sharedStrings.xml')))
-        files['sharedString'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','sharedStrings.xml'),'r'))
+      shared_strings_path = File.join(dir_path,'xl','sharedStrings.xml')
+      if File.exist?(shared_strings_path)
+        files['sharedString'] = Nokogiri::XML.parse(File.open(shared_strings_path,'r'))
       end
 
       unless @data_only
@@ -398,7 +399,7 @@ module RubyXL
           files['vbaProject'] = File.open(vba_path,'rb').read
         end
       end
-      files['styles'] = Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','styles.xml'),'r'))
+
       @num_sheets = files['workbook'].css('sheets').children.size
       @num_sheets = Integer(@num_sheets)
 
