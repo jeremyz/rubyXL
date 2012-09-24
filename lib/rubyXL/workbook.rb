@@ -85,7 +85,7 @@ module RubyXL
     end
 
     def num_fmts_by_id
-      
+
       return @num_fmts_hash unless @num_fmts_hash.nil?
       if num_fmts
         @num_fmts_hash={}
@@ -152,18 +152,17 @@ module RubyXL
 
         #preserves external links (exactly, no modification allowed)
         unless @external_links.nil?
-          #-1 because of rels
-          1.upto(@external_links.size-1) do |i|
+          @external_links.each_with_index do |link,i|
             zipfile.get_output_stream(
-              File.join('xl','externalLinks',"externalLink#{i}.xml")) {|f|
-                f.puts(@external_links[i])
+              File.join('xl','externalLinks',"externalLink#{i+1}.xml")) {|f|
+                f.puts(link)
               }
           end
-          @external_links['rels'].each_index do |i|
-            unless @external_links['rels'][i].nil?
+          @external_links['rels'].each_with_index do |rel,i|
+            unless rel.nil?
               zipfile.get_output_stream(
-                File.join('xl','externalLinks','_rels',"externalLink#{i}.xml.rels")) {|f|
-                  f.puts(@external_links['rels'][i])
+                File.join('xl','externalLinks','_rels',"externalLink#{i+1}.xml.rels")) {|f|
+                  f.puts(rel)
                 }
             end
           end
@@ -171,28 +170,28 @@ module RubyXL
 
         #preserves drawings (exactly, no modification allowed)
         unless @drawings.nil?
-          1.upto(@drawings.size) do |i|
+          @drawings.each_with_index do |draw,i|
             zipfile.get_output_stream(
-            File.join('xl','drawings',"vmlDrawing#{i}.vml")) {|f|
-              f.puts(@drawings[i])
+            File.join('xl','drawings',"vmlDrawing#{i+1}.vml")) {|f|
+              f.puts(draw)
             }
           end
         end
 
         unless @printer_settings.nil?
-          1.upto(@printer_settings.size) do |i|
+          @printer_settings.each_with_index do |printer,i|
             zipfile.get_output_stream(
-            File.join('xl','printerSettings',"printerSettings#{i}.bin")) {|f|
-              f.puts(@printer_settings[i])
+            File.join('xl','printerSettings',"printerSettings#{i+1}.bin")) {|f|
+              f.puts(printer)
             }
           end
         end
 
         unless @worksheet_rels.nil?
-          1.upto(@worksheet_rels.size) do |i|
+          @worksheet_rels.each_with_index do |ws,i|
             zipfile.get_output_stream(
-            File.join('xl','worksheets','_rels',"sheet#{i}.xml.rels")) {|f|
-              f.puts(@worksheet_rels[i])
+            File.join('xl','worksheets','_rels',"sheet#{i+1}.xml.rels")) {|f|
+              f.puts(ws)
             }
           end
         end

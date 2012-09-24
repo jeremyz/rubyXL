@@ -48,7 +48,7 @@ module RubyXL
       files = Parser.decompress(file_path, skip_filename_check)
       wb = Parser.fill_workbook(file_path, files)
 
-      if(files['sharedString'] != nil)
+      unless files['sharedString'].nil?
         wb.num_strings = Integer(files['sharedString'].css('sst').attribute('count').value())
         wb.size = Integer(files['sharedString'].css('sst').attribute('uniqueCount').value())
 
@@ -340,51 +340,51 @@ module RubyXL
         #preserves external links
         ext_links_path = File.join(dir_path,'xl','externalLinks')
         if File.directory?(ext_links_path)
-          files['externalLinks'] = {}
+          files['externalLinks'] = []
           dir = Dir.new(ext_links_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |link,i|
-            files['externalLinks'][i+1] = File.read(File.join(ext_links_path,link))
+            files['externalLinks'] << File.read(File.join(ext_links_path,link))
           end
 
           ext_links_rels_path = File.join(ext_links_path,'_rels')
           if File.directory?(ext_links_rels_path)
-            files['externalLinks']['rels'] = {}
+            files['externalLinks']['rels'] = []
             Dir.glob(File.join(ext_links_rels_path,'*.rels')).each_with_index do |rel, i|
-              files['externalLinks']['rels'][i+1] = File.read(rel)
+              files['externalLinks']['rels'] <<  File.read(rel)
             end
           end
         end
 
         drawings_rels_path = File.join(dir_path,'xl','drawings','_rels')
         if File.directory?(drawings_rels_path)
-          files['drawings'] = {}
+          files['drawings'] = []
           Dir.glob(File.join(drawings_rels_path,'*.rels')).each_with_index do |rel, i|
-            files['drawings'][i+1] = File.read(rel)
+            files['drawings'] << File.read(rel)
           end
         end
 
         printer_path = File.join(dir_path,'xl','printerSettings')
         if File.directory?(printer_path)
-          files['printerSettings'] = {}
+          files['printerSettings'] = []
           dir = Dir.new(printer_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |print, i|
-            files['printerSettings'][i+1] = File.open(File.join(printer_path,print), 'rb').read
+            files['printerSettings'] << File.open(File.join(printer_path,print), 'rb').read
           end
         end
 
         worksheet_rels_path = File.join(dir_path,'xl','worksheets','_rels')
         if File.directory?(worksheet_rels_path)
-          files['worksheetRels'] = {}
-          Dir.glob(File.join(worksheet_rels_path,'*.rels')).each_with_index do |rel, i|
-            files['worksheetRels'][i+1] = File.read(rel)
+          files['worksheetRels'] = []
+          Dir.glob(File.join(worksheet_rels_path,'*.rels')).each do |rel|
+            files['worksheetRels'] <<  File.read(rel)
           end
         end
 
         control_props_path = File.join(dir_path,'xl','ctrlProps')
         if File.directory?(control_props_path)
-          files['controlProps'] = {}
+          files['controlProps'] = []
           Dir.glob(File.join(control_props_path,'*.xml')).each_with_index do |file, i|
-            files['controlProps'][i+1] = Nokogiri::XML.parse(File.open(file,'r'))
+            files['controlProps'] << Nokogiri::XML.parse(File.open(file,'r'))
           end
         end
 
