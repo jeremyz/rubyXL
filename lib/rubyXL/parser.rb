@@ -347,23 +347,19 @@ module RubyXL
           end
 
           ext_links_rels_path = File.join(ext_links_path,'_rels')
-          files['externalLinks']['rels'] = {}
           if File.directory?(ext_links_rels_path)
-            dir = Dir.new(ext_links_rels_path).entries.reject{|f| ignored_files.include? f}
-            dir.each_with_index do |rel,i|
-              files['externalLinks']['rels'][i+1] = File.read(File.join(ext_links_path,'_rels',rel))
+            files['externalLinks']['rels'] = {}
+            Dir.glob(File.join(ext_links_rels_path,'*.rels')).each_with_index do |rel, i|
+              files['externalLinks']['rels'][i+1] = File.read(rel)
             end
-          else
-            FileUtils.mkdir_p(ext_links_rels_path)
           end
         end
 
-        drawings_path = File.join(dir_path,'xl','drawings','_rels')
-        if File.directory?(drawings_path)
+        drawings_rels_path = File.join(dir_path,'xl','drawings','_rels')
+        if File.directory?(drawings_rels_path)
           files['drawings'] = {}
-          dir = Dir.new(drawings_path).entries.reject {|f| ignored_files.include? f}
-          dir.each_with_index do |draw,i|
-            files['drawings'][i+1] = File.read(File.join(drawings_path,draw))
+          Dir.glob(File.join(drawings_rels_path,'*.rels')).each_with_index do |rel, i|
+            files['drawings'][i+1] = File.read(rel)
           end
         end
 
@@ -379,18 +375,16 @@ module RubyXL
         worksheet_rels_path = File.join(dir_path,'xl','worksheets','_rels')
         if File.directory?(worksheet_rels_path)
           files['worksheetRels'] = {}
-          dir = Dir.new(worksheet_rels_path).entries.reject {|f| ignored_files.include? f}
-          dir.each_with_index do |rel, i|
-            files['worksheetRels'][i+1] = File.read(File.join(worksheet_rels_path,rel))
+          Dir.glob(File.join(worksheet_rels_path,'*.rels')).each_with_index do |rel, i|
+            files['worksheetRels'][i+1] = File.read(rel)
           end
         end
 
         control_props_path = File.join(dir_path,'xl','ctrlProps')
         if File.directory?(control_props_path)
           files['controlProps'] = {}
-          dir = Dir.new(control_props_path).entries.reject {|f| ignored_files.include? f}
-          dir.each_with_index do |rel, i|
-            files['controlProps'][i+1] = Nokogiri::XML.parse(File.open(control_props_path,'r'))
+          Dir.glob(File.join(control_props_path,'*.xml')).each_with_index do |file, i|
+            files['controlProps'][i+1] = Nokogiri::XML.parse(File.open(file,'r'))
           end
         end
 
