@@ -78,6 +78,7 @@ module RubyXL
       wb.drawings = files['drawings']
       wb.printer_settings = files['printerSettings']
       wb.worksheet_rels = files['worksheetRels']
+      wb.control_props = files['controlProps']
       wb.macros = files['vbaProject']
 
       #for each worksheet:
@@ -380,6 +381,15 @@ module RubyXL
           dir = Dir.new(worksheet_rels_path).entries.reject {|f| ignored_files.include? f}
           dir.each_with_index do |rel, i|
             files['worksheetRels'][i+1] = File.read(File.join(worksheet_rels_path,rel))
+          end
+        end
+
+        control_props_path = File.join(dir_path,'xl','ctrlProps')
+        if File.directory?(control_props_path)
+          files['controlProps'] = {}
+          dir = Dir.new(control_props_path).entries.reject {|f| ignored_files.include? f}
+          dir.each_with_index do |rel, i|
+            files['controlProps'][i+1] = Nokogiri::XML.parse(File.open(control_props_path,'r'))
           end
         end
 

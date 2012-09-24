@@ -17,7 +17,7 @@ module RubyXL
     attr_accessor :worksheets, :filepath, :creator, :modifier, :created_at,
       :modified_at, :company, :application, :appversion, :num_fmts, :num_fmts_hash, :fonts, :fills,
       :borders, :cell_xfs, :cell_style_xfs, :cell_styles, :shared_strings, :calc_chain,
-      :num_strings, :size, :date1904, :external_links, :style_corrector, :drawings,
+      :num_strings, :size, :date1904, :external_links, :style_corrector, :drawings, :control_props,
       :worksheet_rels, :printer_settings, :macros, :colors, :shared_strings_XML, :defined_names, :column_lookup_hash
 
 
@@ -54,6 +54,7 @@ module RubyXL
       @external_links     = nil
       @style_corrector    = nil
       @drawings           = nil
+      @control_props      = nil
       @worksheet_rels     = nil
       @printer_settings   = nil
       @macros             = nil
