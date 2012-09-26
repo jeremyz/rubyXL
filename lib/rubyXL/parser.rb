@@ -235,6 +235,30 @@ module RubyXL
           wb.worksheets[i].legacy_drawing = nil
         end
         ##end legacy drawing
+
+        ##mc:AlternateContent/**/control##
+        alternate_content_nodes = worksheet_file.xpath('/xmlns:worksheet/mc:AlternateContent/mc:Choice/xmlns:controls/mc:AlternateContent/mc:Choice/xmlns:control',namespaces)
+        unless alternate_content_nodes.empty?
+          c = {}
+          alternate_content_nodes.each do |node|
+            h = Hash.xml_node_to_hash(node)
+            c[h[:attributes][:id]] = h
+          end
+          wb.worksheets[i].controls = c
+        end
+        ##end control##
+
+        ##relations##
+        relations_nodes = files['worksheetRels'][i].xpath('/xmlns:Relationships/xmlns:Relationship')
+        unless relations_nodes.empty?
+          r = {}
+          relations_nodes.each do |node|
+            h = Hash.xml_node_to_hash(node)
+            r[h[:attributes][:Id]] = h
+          end
+          wb.worksheets[i].relations = r
+        end
+        ##end relations##
       end
 
 

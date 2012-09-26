@@ -4,7 +4,7 @@ class Worksheet < PrivateClass
 
   attr_accessor :sheet_name, :sheet_data, :cols, :merged_cells, :pane,
                 :validations, :sheet_view, :legacy_drawing, :extLst, :workbook, :row_styles, :sheet_format_pr, :sheet_pr,
-                :page_margins, :page_setup
+                :page_margins, :page_setup, :controls, :relations
 
   def initialize(workbook, sheet_name='Sheet1',sheet_data=[[nil]],cols=[], merged_cells=[])
     @workbook = workbook
@@ -36,6 +36,12 @@ class Worksheet < PrivateClass
   def extract_data(args = {})
     raw_values = args.delete(:raw) || false
     return @sheet_data.map {|row| row.map {|c| if c.is_a?(Cell) then c.value(:raw => raw_values) else nil end}}
+  end
+
+  def get_control_hash(id)
+    c=@workbook.control_props[File.split(relations[id][:attributes][:Target])[-1][0..-5]]
+    return nil if c.nil?
+    Hash.xml_node_to_hash(c.xpath('xmlns:formControlPr').first)
   end
 
   def get_table(headers=[],opts={})
