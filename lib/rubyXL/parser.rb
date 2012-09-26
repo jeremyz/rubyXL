@@ -393,15 +393,15 @@ module RubyXL
         if File.directory?(worksheet_rels_path)
           files['worksheetRels'] = []
           Dir.glob(File.join(worksheet_rels_path,'*.rels')).each do |rel|
-            files['worksheetRels'] <<  File.read(rel)
+            files['worksheetRels'] << Nokogiri::XML.parse(File.open(rel,'r'))
           end
         end
 
         control_props_path = File.join(dir_path,'xl','ctrlProps')
         if File.directory?(control_props_path)
-          files['controlProps'] = []
+          files['controlProps'] = {}
           Dir.glob(File.join(control_props_path,'*.xml')).each_with_index do |file, i|
-            files['controlProps'] << Nokogiri::XML.parse(File.open(file,'r'))
+            files['controlProps'][File.split(file)[-1][0..-5]] = Nokogiri::XML.parse(File.open(file,'r'))
           end
         end
 
