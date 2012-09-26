@@ -167,38 +167,38 @@ module RubyXL
     # shared_strings has group of indexed strings which the cells reference
     def Parser.fill_worksheet(wb,i,files,shared_strings)
       wb.worksheets[i] = Parser.create_matrix(wb, i, files)
-      j = i+1
 
-      namespaces = files[j].root.namespaces()
+      worksheet_file = files['worksheets'][i]
+      namespaces = worksheet_file.root.namespaces()
       unless @data_only
-        sheet_views_node= files[j].xpath('/xmlns:worksheet/xmlns:sheetViews[xmlns:sheetView]',namespaces).first
+        sheet_views_node= worksheet_file.xpath('/xmlns:worksheet/xmlns:sheetViews[xmlns:sheetView]',namespaces).first
         wb.worksheets[i].sheet_view = Hash.xml_node_to_hash(sheet_views_node)[:sheetView]
 
         ##sheetFormatPr##
-        sheet_format_pr_node = files[j].xpath('/xmlns:worksheet/xmlns:sheetFormatPr', namespaces).first
+        sheet_format_pr_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:sheetFormatPr', namespaces).first
         wb.worksheets[i].sheet_format_pr = Hash.xml_node_to_hash(sheet_format_pr_node)
 
         ##sheetPr##
-        sheet_pr_node = files[j].xpath('/xmlns:worksheet/xmlns:sheetPr', namespaces).first
+        sheet_pr_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:sheetPr', namespaces).first
         wb.worksheets[i].sheet_pr = Hash.xml_node_to_hash(sheet_pr_node)
 
         ##pageMargins##
-        page_margins_node = files[j].xpath('/xmlns:worksheet/xmlns:pageMargins', namespaces).first
+        page_margins_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:pageMargins', namespaces).first
         wb.worksheets[i].page_margins = Hash.xml_node_to_hash(page_margins_node)
 
         ##pageSetup##
-        page_setup_node = files[j].xpath('/xmlns:worksheet/xmlns:pageSetup', namespaces).first
+        page_setup_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:pageSetup', namespaces).first
         wb.worksheets[i].page_setup = Hash.xml_node_to_hash(page_setup_node)
 
         ##col styles##
-        cols_node_set = files[j].xpath('/xmlns:worksheet/xmlns:cols',namespaces)
+        cols_node_set = worksheet_file.xpath('/xmlns:worksheet/xmlns:cols',namespaces)
         unless cols_node_set.empty?
           wb.worksheets[i].cols= Hash.xml_node_to_hash(cols_node_set.first)[:col]
         end
         ##end col styles##
 
         ##merge_cells##
-        merge_cells_node = files[j].xpath('/xmlns:worksheet/xmlns:mergeCells[xmlns:mergeCell]',namespaces)
+        merge_cells_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:mergeCells[xmlns:mergeCell]',namespaces)
         unless merge_cells_node.empty?
           wb.worksheets[i].merged_cells = Hash.xml_node_to_hash(merge_cells_node.first)[:mergeCell]
         end
@@ -210,7 +210,7 @@ module RubyXL
         ##end sheet_view pane##
 
         ##data_validation##
-        data_validations_node = files[j].xpath('/xmlns:worksheet/xmlns:dataValidations[xmlns:dataValidation]',namespaces)
+        data_validations_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:dataValidations[xmlns:dataValidation]',namespaces)
         unless data_validations_node.empty?
           wb.worksheets[i].validations = Hash.xml_node_to_hash(data_validations_node.first)[:dataValidation]
         else
@@ -219,7 +219,7 @@ module RubyXL
         ##end data_validation##
 
         #extLst
-        ext_list_node=files[j].xpath('/xmlns:worksheet/xmlns:extLst',namespaces)
+        ext_list_node=worksheet_file.xpath('/xmlns:worksheet/xmlns:extLst',namespaces)
         unless ext_list_node.empty?
           wb.worksheets[i].extLst = Hash.xml_node_to_hash(ext_list_node.first)
         else
@@ -228,7 +228,7 @@ module RubyXL
         #extLst
 
         ##legacy drawing##
-        legacy_drawing_node = files[j].xpath('/xmlns:worksheet/xmlns:legacyDrawing',namespaces)
+        legacy_drawing_node = worksheet_file.xpath('/xmlns:worksheet/xmlns:legacyDrawing',namespaces)
         unless legacy_drawing_node.empty?
           wb.worksheets[i].legacy_drawing = Hash.xml_node_to_hash(legacy_drawing_node.first)
         else
@@ -238,8 +238,8 @@ module RubyXL
       end
 
 
-      #row_data = files[j].xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row[xmlns:c[xmlns:v]]',namespaces)
-      row_data = files[j].xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row',namespaces)
+      #row_data = worksheet_file.xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row[xmlns:c[xmlns:v]]',namespaces)
+      row_data = worksheet_file.xpath('/xmlns:worksheet/xmlns:sheetData/xmlns:row',namespaces)
       row_data.each do |row|
         unless @data_only
           ##row styles##
@@ -415,11 +415,10 @@ module RubyXL
       @num_sheets = Integer(@num_sheets)
 
       #adds all worksheet xml files to files hash
-      i=1
-      1.upto(@num_sheets) do
+      files['worksheets'] = []
+      1.upto(@num_sheets) do |i|
         filename = 'sheet'+i.to_s
-        files[i] = Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','worksheets',filename+'.xml'),'r'))
-        i=i+1
+        files['worksheets'] << Nokogiri::XML.parse(File.open(File.join(dir_path,'xl','worksheets',filename+'.xml'),'r'))
       end
 
       FileUtils.rm_rf(dir_path)
@@ -454,7 +453,7 @@ module RubyXL
       sheet_names = files['app'].css('TitlesOfParts vt|vector vt|lpstr').children
       sheet = Worksheet.new(wb,sheet_names[i].to_s,[])
 
-      dimensions = files[i+1].css('dimension').attribute('ref').to_s
+      dimensions = files['worksheets'][i].css('dimension').attribute('ref').to_s
       if(dimensions =~ /^([A-Z]+\d+:)?([A-Z]+\d+)$/)
         index = convert_to_index($2)
 
